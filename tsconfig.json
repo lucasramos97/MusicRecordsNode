@@ -7,7 +7,7 @@
     "outDir": "./dist",
     "rootDir": "./src",                        
     "removeComments": true,
-    "strict": true,                       
+    "strict": false,                       
     "typeRoots": [
       "./node_modules/@types"
     ],       
@@ -22,7 +22,8 @@
       "@controllers/*": ["./src/controllers/*"],
       "@services/*": ["./src/services/*"],
       "@repositories/*": ["./src/repositories/*"],
-      "@models/*": ["./src/models/*"]
+      "@models/*": ["./src/models/*"],
+      "@routes/*": ["./src/routes/*"]
     }
   },
   "include": [

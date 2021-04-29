@@ -16,7 +16,9 @@
         "@typescript-eslint"
     ],
     "rules": {
-      "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+      "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+      "class-methods-use-this": "off",
+      "no-plusplus": "off"
     },
     "settings": {
       "import/resolver": {

@@ -1,9 +1,5 @@
-import express from 'express';
+import AppController from '@controllers/AppController';
 
-const app = express();
+const app = new AppController().getExpress();
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello Friend!' });
-});
-
-app.listen(8080);
+app.listen(process.env.PORT || 8080);
