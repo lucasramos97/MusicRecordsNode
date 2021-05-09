@@ -15,9 +15,9 @@ module.exports = {
       alias: {
         '@controllers': './src/controllers',
         '@services': './src/services',
-        '@repositories': './src/repositories',
         '@models': './src/models',
         '@routes': './src/routes',
+        '@config': '.src/config',
       },
     }],
     ['@babel/plugin-proposal-decorators', { legacy: true }],

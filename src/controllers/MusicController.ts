@@ -16,12 +16,11 @@ export default class MusicController {
     return res.json(result);
   }
 
-  async save(req: Request, res: Response): Promise<Response<any>> {
+  async save(req: Request, res: Response): Promise<Response<Music>> {
     const music = req.body;
 
-    const musicService = new MusicService();
-
     try {
+      const musicService = new MusicService();
       const result = await musicService.save(music);
 
       return res.status(201).json(result);

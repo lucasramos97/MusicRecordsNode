@@ -26,6 +26,24 @@ beforeAll(async () => {
   }
 });
 
+describe('List Musics', () => {
+  it('get all musics paginated without query params', async () => {
+    const response = await request(app).get('/musics');
+
+    expect(response.body.content.length).toBeLessThanOrEqual(5);
+    expect(response.body.content[4].title).toBe('Title 5');
+    expect(response.status).toBe(200);
+  });
+
+  it('get all musics paginated with query params', async () => {
+    const response = await request(app).get('/musics?page=1&size=4');
+
+    expect(response.body.content.length).toBeLessThanOrEqual(4);
+    expect(response.body.content[1].title).toBe('Title 6');
+    expect(response.status).toBe(200);
+  });
+});
+
 describe('Save Music', () => {
   it('save musics with valid credentials', async () => {
     const releaseDate = new Date().toISOString().split('T')[0];
@@ -131,23 +149,5 @@ describe('Save Music', () => {
 
     expect(response.body.message).toBe('Duration is required!');
     expect(response.status).toBe(400);
-  });
-});
-
-describe('List Musics', () => {
-  it('get all musics paginated without query params', async () => {
-    const response = await request(app).get('/musics');
-
-    expect(response.body.content.length).toBeLessThanOrEqual(5);
-    expect(response.body.content[4].title).toBe('Title 5');
-    expect(response.status).toBe(200);
-  });
-
-  it('get all musics paginated with query params', async () => {
-    const response = await request(app).get('/musics?page=1&size=4');
-
-    expect(response.body.content.length).toBeLessThanOrEqual(4);
-    expect(response.body.content[1].title).toBe('Title 6');
-    expect(response.status).toBe(200);
   });
 });

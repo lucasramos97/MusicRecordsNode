@@ -2,7 +2,7 @@
 import Music from '@models/Music';
 import { Sequelize } from 'sequelize-typescript';
 
-const config = require('../database/config/database');
+const config = require('./database');
 
 export default class SequelizeConfig {
   private static instance: Sequelize;
