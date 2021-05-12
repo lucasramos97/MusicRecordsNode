@@ -42,4 +42,17 @@ export default class MusicController {
       return res.status(400).json({ message: error.message });
     }
   }
+
+  public async logicalDelete(req: Request, res: Response): Promise<Response<Music>> {
+    const musicId = Number.parseInt(req.params.id, 10);
+
+    try {
+      const musicService = new MusicService();
+      const result = await musicService.logicalDelete(musicId);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
 }

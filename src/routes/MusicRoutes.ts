@@ -10,6 +10,7 @@ export default class MusicRoutes {
     this.routes.get('/musics', musicController.getAllPagination);
     this.routes.post('/musics', musicController.save);
     this.routes.put('/musics/:id', musicController.update);
+    this.routes.delete('/musics/:id', musicController.logicalDelete);
   }
 
   public getRoutes(): express.Router {

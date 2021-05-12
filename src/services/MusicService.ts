@@ -24,6 +24,21 @@ export default class MusicService {
     );
   }
 
+  public async logicalDelete(musicId: number): Promise<[number, Music[]]> {
+    const music = await Music.findByPk(musicId);
+
+    if (!music || (music && music.isDeleted())) {
+      throw Error('Music not found!');
+    }
+
+    const response = await Music.update(
+      { deleted: true },
+      { where: { id: musicId } },
+    );
+
+    return response;
+  }
+
   private async validate(music: any) {
     if (!music.title) {
       throw new Error('Title is required!');

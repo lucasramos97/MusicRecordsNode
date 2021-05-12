@@ -190,3 +190,36 @@ describe('Update Music', () => {
     expect(response.status).toBe(400);
   });
 });
+
+describe('Delete Music', () => {
+  it('logically delete music', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
+
+    const response = await request(app)
+      .delete(`/musics/${originalMusic.getId()}`);
+
+    const deletedMusic = await Music.findByPk(originalMusic.getId());
+
+    expect(originalMusic.isDeleted()).toBe(false);
+    expect(deletedMusic.isDeleted()).toBe(true);
+    expect(response.status).toBe(200);
+  });
+
+  it('logically delete music with music already deleted', async () => {
+    const music = await Music.findOne({ where: { title: 'Title 11' } });
+
+    const response = await request(app)
+      .delete(`/musics/${music.getId()}`);
+
+    expect(response.body.message).toBe('Music not found!');
+    expect(response.status).toBe(400);
+  });
+
+  it('logically delete music with non-existent music', async () => {
+    const response = await request(app)
+      .delete(`/musics/${1000}`);
+
+    expect(response.body.message).toBe('Music not found!');
+    expect(response.status).toBe(400);
+  });
+});
