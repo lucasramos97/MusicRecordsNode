@@ -44,8 +44,8 @@ describe('Get Music', () => {
 
     const compareMusic = {
       ...music.toJSON(),
-      createdAt: music.getCreatedAt().toISOString(),
-      updatedAt: music.getUpdatedAt().toISOString(),
+      createdAt: music.getCreatedAt().toJSON(),
+      updatedAt: music.getUpdatedAt().toJSON(),
     };
 
     expect(response.body).toMatchObject(compareMusic);
@@ -88,11 +88,11 @@ describe('Save Music', () => {
       .post('/musics')
       .send(music);
 
-    const musicReturn = {
+    const compareMusic = {
       ...music, numberViews: 0, feat: false, deleted: false,
     };
 
-    expect(response.body).toMatchObject(musicReturn);
+    expect(response.body).toMatchObject(compareMusic);
     expect(response.status).toBe(201);
   });
 
@@ -165,8 +165,8 @@ describe('Update Music', () => {
 
     const compareOriginalMusic = {
       ...originalMusicJson,
-      releaseDate: originalMusic.getReleaseDate().toString().split('T')[0],
-      duration: originalMusic.getDuration().toISOString(),
+      releaseDate: originalMusic.getReleaseDate(),
+      duration: originalMusic.getDuration().toJSON(),
       updatedAt: editedMusic.getUpdatedAt(),
     };
 

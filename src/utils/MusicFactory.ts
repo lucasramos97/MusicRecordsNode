@@ -23,26 +23,26 @@ export default class MusicFactory {
   }
 
   public factoryValidCredentialsMusic(): any {
-    const releaseDate = new Date().toISOString().split('T')[0];
+    const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
       title: 'Title Test',
       artist: 'Artist Test',
       releaseDate,
-      duration: new Date().toISOString(),
+      duration: new Date().toJSON(),
       numberViews: 1,
       feat: true,
     };
   }
 
   public factoryMinimumValidCredentialsMusic(): any {
-    const releaseDate = new Date().toISOString().split('T')[0];
+    const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
       title: 'Title 1',
       artist: 'Artist 1',
       releaseDate,
-      duration: new Date().toISOString(),
+      duration: new Date().toJSON(),
     };
   }
 }
