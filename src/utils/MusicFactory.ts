@@ -1,8 +1,16 @@
 export default class MusicFactory {
-  public factoryTenMinimumValidCredentialsMusics(): any[] {
+  public factoryTenFirstMusicsForTesting(): any[] {
     const musics = [];
 
-    for (let index = 1; index <= 10; index++) {
+    musics.push({
+      title: 'Title 1',
+      artist: 'Artist 1',
+      releaseDate: new Date(),
+      duration: new Date(),
+      deleted: true,
+    });
+
+    for (let index = 2; index <= 10; index++) {
       musics.push({
         title: `Title ${index}`,
         artist: `Artist ${index}`,

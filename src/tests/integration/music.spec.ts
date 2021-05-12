@@ -14,7 +14,7 @@ beforeAll(async () => {
     truncate: true,
   });
 
-  const musics = musicFactory.factoryTenMinimumValidCredentialsMusics();
+  const musics = musicFactory.factoryTenFirstMusicsForTesting();
   await Music.bulkCreate(musics);
 });
 
@@ -33,6 +33,39 @@ describe('List Musics', () => {
     expect(response.body.content.length).toBeLessThanOrEqual(4);
     expect(response.body.content[1].title).toBe('Title 6');
     expect(response.status).toBe(200);
+  });
+});
+
+describe('Get Music', () => {
+  it('get music by id', async () => {
+    const music = await Music.findOne({ where: { title: 'Title 2' } });
+
+    const response = await request(app).get(`/musics/${music.getId()}`);
+
+    const compareMusic = {
+      ...music.toJSON(),
+      createdAt: music.getCreatedAt().toISOString(),
+      updatedAt: music.getUpdatedAt().toISOString(),
+    };
+
+    expect(response.body).toMatchObject(compareMusic);
+    expect(response.status).toBe(200);
+  });
+
+  it('get music by id with music already deleted', async () => {
+    const music = await Music.findOne({ where: { title: 'Title 1' } });
+
+    const response = await request(app).get(`/musics/${music.getId()}`);
+
+    expect(response.body.message).toBe('Music not found!');
+    expect(response.status).toBe(400);
+  });
+
+  it('get music by id with non-existent music', async () => {
+    const response = await request(app).get(`/musics/${1000}`);
+
+    expect(response.body.message).toBe('Music not found!');
+    expect(response.status).toBe(400);
   });
 });
 

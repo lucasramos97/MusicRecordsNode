@@ -94,6 +94,10 @@ export default class Music extends Model {
     this.deleted = deleted;
   }
 
+  public getCreatedAt(): Date {
+    return this.createdAt;
+  }
+
   public getUpdatedAt(): Date {
     return this.updatedAt;
   }

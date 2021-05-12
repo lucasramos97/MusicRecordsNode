@@ -11,6 +11,10 @@ export default class MusicService {
     return new PaginatedQueryModel<Music>(result);
   }
 
+  public async getById(musicId: number): Promise<Music> {
+    return this.getMusicIfExists(musicId);
+  }
+
   public async save(music: any): Promise<Music> {
     await this.validate(music);
     return Music.create(music);
@@ -25,11 +29,7 @@ export default class MusicService {
   }
 
   public async logicalDelete(musicId: number): Promise<[number, Music[]]> {
-    const music = await Music.findByPk(musicId);
-
-    if (!music || (music && music.isDeleted())) {
-      throw Error('Music not found!');
-    }
+    await this.getMusicIfExists(musicId);
 
     const response = await Music.update(
       { deleted: true },
@@ -55,5 +55,15 @@ export default class MusicService {
     if (!music.duration) {
       throw new Error('Duration is required!');
     }
+  }
+
+  private async getMusicIfExists(musicId: number): Promise<Music> {
+    const music = await Music.findByPk(musicId);
+
+    if (!music || (music && music.isDeleted())) {
+      throw Error('Music not found!');
+    }
+
+    return music;
   }
 }

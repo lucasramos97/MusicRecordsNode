@@ -16,6 +16,19 @@ export default class MusicController {
     return res.json(result);
   }
 
+  public async getById(req: Request, res: Response): Promise<Response<Music>> {
+    const musicId = Number.parseInt(req.params.id, 10);
+
+    try {
+      const musicService = new MusicService();
+      const result = await musicService.getById(musicId);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
   public async save(req: Request, res: Response): Promise<Response<Music>> {
     const music = req.body;
 
