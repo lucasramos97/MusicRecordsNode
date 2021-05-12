@@ -18,6 +18,7 @@ module.exports = {
         '@models': './src/models',
         '@routes': './src/routes',
         '@config': '.src/config',
+        '@utils': '.src/utils',
       },
     }],
     ['@babel/plugin-proposal-decorators', { legacy: true }],

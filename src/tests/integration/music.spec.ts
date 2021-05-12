@@ -1,10 +1,12 @@
 /* eslint-disable no-await-in-loop */
 import AppController from '@controllers/AppController';
 import Music from '@models/Music';
+import MusicFactory from '@utils/MusicFactory';
 
 const request = require('supertest');
 
 const app = new AppController().getExpress();
+const musicFactory = new MusicFactory();
 
 beforeAll(async () => {
   await Music.destroy({
@@ -12,22 +14,12 @@ beforeAll(async () => {
     truncate: true,
   });
 
-  for (let index = 1; index <= 10; index++) {
-    await request(app)
-      .post('/musics')
-      .send({
-        title: `Title ${index}`,
-        artist: `Artist ${index}`,
-        releaseDate: new Date(),
-        duration: new Date(),
-        numberViews: index,
-        feat: true,
-      });
-  }
+  const musics = musicFactory.factoryTenMinimumValidCredentialsMusics();
+  await Music.bulkCreate(musics);
 });
 
 describe('List Musics', () => {
-  it('get all musics paginated without query params', async () => {
+  it('get musics paginated without query params', async () => {
     const response = await request(app).get('/musics');
 
     expect(response.body.content.length).toBeLessThanOrEqual(5);
@@ -35,7 +27,7 @@ describe('List Musics', () => {
     expect(response.status).toBe(200);
   });
 
-  it('get all musics paginated with query params', async () => {
+  it('get musics paginated with query params', async () => {
     const response = await request(app).get('/musics?page=1&size=4');
 
     expect(response.body.content.length).toBeLessThanOrEqual(4);
@@ -45,17 +37,8 @@ describe('List Musics', () => {
 });
 
 describe('Save Music', () => {
-  it('save musics with valid credentials', async () => {
-    const releaseDate = new Date().toISOString().split('T')[0];
-
-    const music = {
-      title: 'Title 1',
-      artist: 'Artist 1',
-      releaseDate,
-      duration: new Date().toISOString(),
-      numberViews: 1,
-      feat: true,
-    };
+  it('save music with valid credentials', async () => {
+    const music = musicFactory.factoryValidCredentialsMusic();
 
     const response = await request(app)
       .post('/musics')
@@ -65,15 +48,8 @@ describe('Save Music', () => {
     expect(response.status).toBe(201);
   });
 
-  it('save musics with minimum valid credentials', async () => {
-    const releaseDate = new Date().toISOString().split('T')[0];
-
-    const music = {
-      title: 'Title 1',
-      artist: 'Artist 1',
-      releaseDate,
-      duration: new Date().toISOString(),
-    };
+  it('save music with minimum valid credentials', async () => {
+    const music = musicFactory.factoryMinimumValidCredentialsMusic();
 
     const response = await request(app)
       .post('/musics')
@@ -87,65 +63,128 @@ describe('Save Music', () => {
     expect(response.status).toBe(201);
   });
 
-  it('save musics without title field', async () => {
+  it('save music without title field', async () => {
+    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    music.title = '';
+
     const response = await request(app)
       .post('/musics')
-      .send({
-        title: '',
-        artist: 'Artist 1',
-        releaseDate: new Date(),
-        duration: new Date(),
-        numberViews: 1,
-        feat: true,
-      });
+      .send(music);
 
     expect(response.body.message).toBe('Title is required!');
     expect(response.status).toBe(400);
   });
 
-  it('save musics without artist field', async () => {
+  it('save music without artist field', async () => {
+    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    music.artist = '';
+
     const response = await request(app)
       .post('/musics')
-      .send({
-        title: 'Title 1',
-        artist: '',
-        releaseDate: new Date(),
-        duration: new Date(),
-        numberViews: 1,
-        feat: true,
-      });
+      .send(music);
 
     expect(response.body.message).toBe('Artist is required!');
     expect(response.status).toBe(400);
   });
 
-  it('save musics without release date field', async () => {
+  it('save music without release date field', async () => {
+    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    music.releaseDate = null;
+
     const response = await request(app)
       .post('/musics')
-      .send({
-        title: 'Title 1',
-        artist: 'Artist 1',
-        releaseDate: null,
-        duration: new Date(),
-        numberViews: 1,
-        feat: true,
-      });
+      .send(music);
 
     expect(response.body.message).toBe('Release Date is required!');
     expect(response.status).toBe(400);
   });
 
-  it('save musics without duration field', async () => {
+  it('save music without duration field', async () => {
+    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    music.duration = null;
+
     const response = await request(app)
       .post('/musics')
-      .send({
-        title: 'Title 1',
-        artist: 'Artist 1',
-        releaseDate: new Date(),
-        duration: null,
-        numberViews: 1,
-        feat: true,
-      });
+      .send(music);
+
+    expect(response.body.message).toBe('Duration is required!');
+    expect(response.status).toBe(400);
+  });
+});
+
+describe('Update Music', () => {
+  it('update all music fields', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 10' } });
+    originalMusic.setTitle('Title 11');
+    originalMusic.setArtist('Artist 11');
+    originalMusic.setReleaseDate(new Date('2020-1-1'));
+    originalMusic.setDuration(new Date(2020, 0, 1, 0, 6, 44));
+    originalMusic.setNumberViews(11);
+    originalMusic.setFeat(true);
+
+    const originalMusicJson = originalMusic.toJSON();
+
+    const response = await request(app)
+      .put(`/musics/${originalMusic.getId()}`)
+      .send(originalMusicJson);
+
+    const editedMusic = await Music.findByPk(originalMusic.getId());
+
+    const compareOriginalMusic = {
+      ...originalMusicJson,
+      releaseDate: originalMusic.getReleaseDate().toString().split('T')[0],
+      duration: originalMusic.getDuration().toISOString(),
+      updatedAt: editedMusic.getUpdatedAt(),
+    };
+
+    expect(response.body).toStrictEqual([1]);
+    expect(editedMusic.toJSON()).toMatchObject(compareOriginalMusic);
+    expect(response.status).toBe(200);
+  });
+
+  it('update music without title field', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
+    originalMusic.setTitle('');
+
+    const response = await request(app)
+      .put(`/musics/${originalMusic.getId()}`)
+      .send(originalMusic.toJSON());
+
+    expect(response.body.message).toBe('Title is required!');
+    expect(response.status).toBe(400);
+  });
+
+  it('update music without artist field', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
+    originalMusic.setArtist('');
+
+    const response = await request(app)
+      .put(`/musics/${originalMusic.getId()}`)
+      .send(originalMusic.toJSON());
+
+    expect(response.body.message).toBe('Artist is required!');
+    expect(response.status).toBe(400);
+  });
+
+  it('update music without release date field', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
+    originalMusic.setReleaseDate(null);
+
+    const response = await request(app)
+      .put(`/musics/${originalMusic.getId()}`)
+      .send(originalMusic.toJSON());
+
+    expect(response.body.message).toBe('Release Date is required!');
+    expect(response.status).toBe(400);
+  });
+
+  it('update music without duration field', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
+    originalMusic.setDuration(null);
+
+    const response = await request(app)
+      .put(`/musics/${originalMusic.getId()}`)
+      .send(originalMusic.toJSON());
 
     expect(response.body.message).toBe('Duration is required!');
     expect(response.status).toBe(400);

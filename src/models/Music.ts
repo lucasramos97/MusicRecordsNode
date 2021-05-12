@@ -93,4 +93,8 @@ export default class Music extends Model {
   public setDeleted(deleted: boolean) {
     this.deleted = deleted;
   }
+
+  public getUpdatedAt(): Date {
+    return this.updatedAt;
+  }
 }

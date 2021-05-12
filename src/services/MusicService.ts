@@ -2,7 +2,7 @@ import Music from '@models/Music';
 import PaginatedQueryModel from '@models/PaginatedQueryModel';
 
 export default class MusicService {
-  async getAllPagination(page = 0, size = 5): Promise<PaginatedQueryModel<Music>> {
+  public async getAllPagination(page = 0, size = 5): Promise<PaginatedQueryModel<Music>> {
     const result = await Music.findAndCountAll({
       offset: size * page,
       limit: size,
@@ -11,9 +11,17 @@ export default class MusicService {
     return new PaginatedQueryModel<Music>(result);
   }
 
-  async save(music: any): Promise<Music> {
+  public async save(music: any): Promise<Music> {
     await this.validate(music);
     return Music.create(music);
+  }
+
+  public async update(musicId: number, music: any): Promise<[number, Music[]]> {
+    await this.validate(music);
+    return Music.update(
+      music,
+      { where: { id: musicId } },
+    );
   }
 
   private async validate(music: any) {
