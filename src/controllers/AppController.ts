@@ -6,12 +6,15 @@ require('dotenv').config({
   path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
 });
 
+const cors = require('cors');
+
 export default class AppController {
   private application: express.Application;
 
   constructor() {
     SequelizeConfig.config();
     this.application = express();
+    this.application.use(cors());
     this.middlewares();
     this.routes();
   }
