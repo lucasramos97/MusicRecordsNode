@@ -25,7 +25,7 @@ describe('List Musics', () => {
     const response = await request(app).get('/musics');
 
     expect(response.body.content.length).toBeLessThanOrEqual(5);
-    expect(response.body.content[4].title).toBe('Title 6');
+    expect(response.body.content[4].title).toBe('Title 5');
     expect(response.status).toBe(200);
   });
 
@@ -33,7 +33,7 @@ describe('List Musics', () => {
     const response = await request(app).get('/musics?page=1&size=4');
 
     expect(response.body.content.length).toBeLessThanOrEqual(4);
-    expect(response.body.content[1].title).toBe('Title 7');
+    expect(response.body.content[1].title).toBe('Title 6');
     expect(response.status).toBe(200);
   });
 });
@@ -278,7 +278,7 @@ describe('List Deleted Musics', () => {
     const response = await request(app).get('/musics/deleted');
 
     expect(response.body.content.length).toBeLessThanOrEqual(5);
-    expect(response.body.content[4].title).toBe('Title 3');
+    expect(response.body.content[4].title).toBe('Title 2');
     expect(response.status).toBe(200);
   });
 
@@ -286,7 +286,7 @@ describe('List Deleted Musics', () => {
     const response = await request(app).get('/musics/deleted/?page=1&size=4');
 
     expect(response.body.content.length).toBeLessThanOrEqual(4);
-    expect(response.body.content[1].title).toBe('Title 4');
+    expect(response.body.content[1].title).toBe('Title 3');
     expect(response.status).toBe(200);
   });
 });
