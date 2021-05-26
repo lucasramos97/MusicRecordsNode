@@ -4,6 +4,9 @@ import PaginatedQueryModel from '@models/PaginatedQueryModel';
 export default class MusicService {
   public async getAllPagination(page = 0, size = 5): Promise<PaginatedQueryModel<Music>> {
     const result = await Music.findAndCountAll({
+      where: {
+        deleted: false,
+      },
       offset: size * page,
       limit: size,
     });
