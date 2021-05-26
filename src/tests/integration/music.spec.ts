@@ -13,17 +13,19 @@ beforeAll(async () => {
     where: {},
     truncate: true,
   });
-
-  const musics = musicFactory.factoryTenFirstMusicsForTesting();
-  await Music.bulkCreate(musics);
 });
 
 describe('List Musics', () => {
+  beforeAll(async () => {
+    const musics = musicFactory.factoryTenFirstMusicsForTesting();
+    await Music.bulkCreate(musics);
+  });
+
   it('get musics paginated without query params', async () => {
     const response = await request(app).get('/musics');
 
     expect(response.body.content.length).toBeLessThanOrEqual(5);
-    expect(response.body.content[4].title).toBe('Title 5');
+    expect(response.body.content[4].title).toBe('Title 6');
     expect(response.status).toBe(200);
   });
 
@@ -31,7 +33,7 @@ describe('List Musics', () => {
     const response = await request(app).get('/musics?page=1&size=4');
 
     expect(response.body.content.length).toBeLessThanOrEqual(4);
-    expect(response.body.content[1].title).toBe('Title 6');
+    expect(response.body.content[1].title).toBe('Title 7');
     expect(response.status).toBe(200);
   });
 });
@@ -254,5 +256,37 @@ describe('Delete Music', () => {
 
     expect(response.body.message).toBe('Music not found!');
     expect(response.status).toBe(400);
+  });
+});
+
+describe('Count Deleted Musics', () => {
+  it('count deleted musics', async () => {
+    const response = await request(app).get('/musics/deleted/count');
+
+    expect(response.body).toBe(2);
+    expect(response.status).toBe(200);
+  });
+});
+
+describe('List Deleted Musics', () => {
+  beforeAll(async () => {
+    const musics = musicFactory.factoryTenDeletedMusics();
+    await Music.bulkCreate(musics);
+  });
+
+  it('get deleted musics paginated without query params', async () => {
+    const response = await request(app).get('/musics/deleted');
+
+    expect(response.body.content.length).toBeLessThanOrEqual(5);
+    expect(response.body.content[4].title).toBe('Title 3');
+    expect(response.status).toBe(200);
+  });
+
+  it('get deleted musics paginated with query params', async () => {
+    const response = await request(app).get('/musics/deleted/?page=1&size=4');
+
+    expect(response.body.content.length).toBeLessThanOrEqual(4);
+    expect(response.body.content[1].title).toBe('Title 4');
+    expect(response.status).toBe(200);
   });
 });

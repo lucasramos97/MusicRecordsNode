@@ -65,4 +65,20 @@ export default class MusicController {
       return res.status(400).json({ message: error.message });
     }
   }
+
+  public async getCountDeletedMusics(req: Request, res: Response): Promise<Response<Number>> {
+    const result = await musicService.getCountDeletedMusics();
+
+    return res.json(result);
+  }
+
+  public async getAllDeletedPagination(req: Request, res: Response):
+  Promise<Response<PaginatedQueryModel<Music>>> {
+    const page = req.query.page ? Number.parseInt(req.query.page.toString(), 10) : 0;
+    const size = req.query.size ? Number.parseInt(req.query.size.toString(), 10) : 5;
+
+    const result = await musicService.getAllDeletedPagination(page, size);
+
+    return res.json(result);
+  }
 }

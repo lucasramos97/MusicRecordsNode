@@ -69,4 +69,24 @@ export default class MusicService {
 
     return music;
   }
+
+  public async getCountDeletedMusics(): Promise<Number> {
+    return Music.count({
+      where: {
+        deleted: true,
+      },
+    });
+  }
+
+  public async getAllDeletedPagination(page = 0, size = 5): Promise<PaginatedQueryModel<Music>> {
+    const result = await Music.findAndCountAll({
+      where: {
+        deleted: true,
+      },
+      offset: size * page,
+      limit: size,
+    });
+
+    return new PaginatedQueryModel<Music>(result);
+  }
 }

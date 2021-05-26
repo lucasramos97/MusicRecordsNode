@@ -45,4 +45,20 @@ export default class MusicFactory {
       duration: new Date().toJSON(),
     };
   }
+
+  public factoryTenDeletedMusics(): any[] {
+    const musics = [];
+
+    for (let index = 1; index <= 10; index++) {
+      musics.push({
+        title: `Title ${index}`,
+        artist: `Artist ${index}`,
+        releaseDate: new Date(),
+        duration: new Date(),
+        deleted: true,
+      });
+    }
+
+    return musics;
+  }
 }
