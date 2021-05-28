@@ -290,3 +290,15 @@ describe('List Deleted Musics', () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe('Restore Deleted Musics', () => {
+  it('restore deleted musics', async () => {
+    const deletedMusicsBefore = await request(app).get('/musics/deleted');
+    const response = await request(app).post('/musics/deleted/restore').send(deletedMusicsBefore.body.content);
+    const deletedMusicsAfter = await request(app).get('/musics/deleted');
+
+    expect(response.body).toStrictEqual([5]);
+    expect(deletedMusicsAfter.body.total).toBe(deletedMusicsBefore.body.total - 5);
+    expect(response.status).toBe(200);
+  });
+});

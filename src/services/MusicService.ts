@@ -70,6 +70,15 @@ export default class MusicService {
     return new PaginatedQueryModel<Music>(result);
   }
 
+  public async restoreDeletedMusics(musics: Music[]): Promise<[number, Music[]]> {
+    const response = await Music.update(
+      { deleted: false },
+      { where: { id: musics.map((m) => m.id) } },
+    );
+
+    return response;
+  }
+
   private async validate(music: any) {
     if (!music.title) {
       throw new Error('Title is required!');

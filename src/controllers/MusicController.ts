@@ -81,4 +81,16 @@ export default class MusicController {
 
     return res.json(result);
   }
+
+  public async restoreDeletedMusics(req: Request, res: Response): Promise<Response<Music>> {
+    const musics = req.body;
+
+    try {
+      const result = await musicService.restoreDeletedMusics(musics);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
 }

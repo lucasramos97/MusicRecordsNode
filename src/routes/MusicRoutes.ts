@@ -8,6 +8,7 @@ export default class MusicRoutes {
     this.routes = express.Router();
     const musicController = new MusicController();
     this.routes.get('/musics/deleted/count/', musicController.getCountDeletedMusics);
+    this.routes.post('/musics/deleted/restore/', musicController.restoreDeletedMusics);
     this.routes.get('/musics/deleted/', musicController.getAllDeletedPagination);
     this.routes.get('/musics/', musicController.getAllPagination);
     this.routes.get('/musics/:id/', musicController.getById);
