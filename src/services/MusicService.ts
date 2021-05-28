@@ -79,6 +79,14 @@ export default class MusicService {
     return response;
   }
 
+  public async definitiveDelete(musicId: number): Promise<Music> {
+    const music = await this.getMusicIfNotExists(musicId);
+
+    await music.destroy();
+
+    return music;
+  }
+
   private async validate(music: any) {
     if (!music.title) {
       throw new Error('Title is required!');
@@ -102,6 +110,16 @@ export default class MusicService {
 
     if (!music || (music && music.isDeleted())) {
       throw Error('Music not found!');
+    }
+
+    return music;
+  }
+
+  private async getMusicIfNotExists(musicId: number): Promise<Music> {
+    const music = await Music.findByPk(musicId);
+
+    if (!music || (music && !music.isDeleted())) {
+      throw Error('Music not deleted!');
     }
 
     return music;

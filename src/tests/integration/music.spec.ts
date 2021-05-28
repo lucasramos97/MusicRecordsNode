@@ -230,8 +230,7 @@ describe('Delete Music', () => {
   it('logically delete music', async () => {
     const originalMusic = await Music.findOne({ where: { title: 'Title 11' } });
 
-    const response = await request(app)
-      .delete(`/musics/${originalMusic.getId()}`);
+    const response = await request(app).delete(`/musics/${originalMusic.getId()}`);
 
     const deletedMusic = await Music.findByPk(originalMusic.getId());
 
@@ -243,28 +242,17 @@ describe('Delete Music', () => {
   it('logically delete music with music already deleted', async () => {
     const music = await Music.findOne({ where: { title: 'Title 11' } });
 
-    const response = await request(app)
-      .delete(`/musics/${music.getId()}`);
+    const response = await request(app).delete(`/musics/${music.getId()}`);
 
     expect(response.body.message).toBe('Music not found!');
     expect(response.status).toBe(400);
   });
 
   it('logically delete music with non-existent music', async () => {
-    const response = await request(app)
-      .delete(`/musics/${1000}`);
+    const response = await request(app).delete(`/musics/${1000}`);
 
     expect(response.body.message).toBe('Music not found!');
     expect(response.status).toBe(400);
-  });
-});
-
-describe('Count Deleted Musics', () => {
-  it('count deleted musics', async () => {
-    const response = await request(app).get('/musics/deleted/count');
-
-    expect(response.body).toBe(2);
-    expect(response.status).toBe(200);
   });
 });
 
@@ -291,14 +279,57 @@ describe('List Deleted Musics', () => {
   });
 });
 
+describe('Count Deleted Musics', () => {
+  it('count deleted musics', async () => {
+    const response = await request(app).get('/musics/deleted/count');
+
+    expect(response.body).toBe(12);
+    expect(response.status).toBe(200);
+  });
+});
+
 describe('Restore Deleted Musics', () => {
   it('restore deleted musics', async () => {
     const deletedMusicsBefore = await request(app).get('/musics/deleted');
-    const response = await request(app).post('/musics/deleted/restore').send(deletedMusicsBefore.body.content);
+
+    const response = await request(app)
+      .post('/musics/deleted/restore')
+      .send(deletedMusicsBefore.body.content);
+
     const deletedMusicsAfter = await request(app).get('/musics/deleted');
 
     expect(response.body).toStrictEqual([5]);
     expect(deletedMusicsAfter.body.total).toBe(deletedMusicsBefore.body.total - 5);
     expect(response.status).toBe(200);
+  });
+});
+
+describe('Definitive Delete Music', () => {
+  it('definitive delete music', async () => {
+    const originalMusic = await Music.findOne({ where: { title: 'Title 4', deleted: true } });
+
+    const response = await request(app).delete(`/musics/definitive/${originalMusic.getId()}`);
+
+    const deletedMusic = await Music.findByPk(originalMusic.getId());
+
+    expect(response.body.deleted).toBe(true);
+    expect(deletedMusic).toBe(null);
+    expect(response.status).toBe(200);
+  });
+
+  it('definitive delete music with music not deleted', async () => {
+    const music = await Music.findOne({ where: { title: 'Title 4', deleted: false } });
+
+    const response = await request(app).delete(`/musics/definitive/${music.getId()}`);
+
+    expect(response.body.message).toBe('Music not deleted!');
+    expect(response.status).toBe(400);
+  });
+
+  it('definitive delete music with non-existent music', async () => {
+    const response = await request(app).delete(`/musics/definitive/${1000}`);
+
+    expect(response.body.message).toBe('Music not deleted!');
+    expect(response.status).toBe(400);
   });
 });
