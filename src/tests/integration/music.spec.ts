@@ -333,3 +333,21 @@ describe('Definitive Delete Music', () => {
     expect(response.status).toBe(400);
   });
 });
+
+describe('Empty List', () => {
+  it('empty list', async () => {
+    const listMusicBefore = await request(app).get('/musics');
+    const deletedListMusicBefore = await request(app).get('/musics/deleted');
+
+    const response = await request(app).delete('/musics/empty-list');
+
+    const listMusicAfter = await request(app).get('/musics');
+    const deletedListMusicAfter = await request(app).get('/musics/deleted');
+
+    expect(listMusicBefore.body.total).toBe(listMusicAfter.body.total);
+    expect(deletedListMusicBefore.body.total).toBeGreaterThan(0);
+    expect(deletedListMusicAfter.body.total).toBe(0);
+    expect(response.body).toBe(deletedListMusicBefore.body.total);
+    expect(response.status).toBe(200);
+  });
+});

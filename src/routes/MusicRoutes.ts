@@ -15,6 +15,7 @@ export default class MusicRoutes {
     this.routes.post('/musics/', musicController.save);
     this.routes.put('/musics/:id/', musicController.update);
     this.routes.delete('/musics/definitive/:id/', musicController.definitiveDelete);
+    this.routes.delete('/musics/empty-list/', musicController.emptyList);
     this.routes.delete('/musics/:id/', musicController.logicalDelete);
   }
 

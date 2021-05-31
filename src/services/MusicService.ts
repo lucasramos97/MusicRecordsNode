@@ -46,7 +46,7 @@ export default class MusicService {
     return response;
   }
 
-  public async getCountDeletedMusics(): Promise<Number> {
+  public async getCountDeletedMusics(): Promise<number> {
     return Music.count({
       where: {
         deleted: true,
@@ -85,6 +85,14 @@ export default class MusicService {
     await music.destroy();
 
     return music;
+  }
+
+  public async emptyList(): Promise<number> {
+    return Music.destroy({
+      where: {
+        deleted: true,
+      },
+    });
   }
 
   private async validate(music: any) {

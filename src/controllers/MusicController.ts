@@ -66,7 +66,7 @@ export default class MusicController {
     }
   }
 
-  public async getCountDeletedMusics(req: Request, res: Response): Promise<Response<Number>> {
+  public async getCountDeletedMusics(req: Request, res: Response): Promise<Response<number>> {
     const result = await musicService.getCountDeletedMusics();
 
     return res.json(result);
@@ -99,6 +99,16 @@ export default class MusicController {
 
     try {
       const result = await musicService.definitiveDelete(musicId);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  public async emptyList(req: Request, res: Response): Promise<Response<number>> {
+    try {
+      const result = await musicService.emptyList();
 
       return res.status(200).json(result);
     } catch (error) {
