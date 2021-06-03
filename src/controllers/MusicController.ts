@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import Music from '@models/Music';
 import PaginatedQueryModel from '@models/PaginatedQueryModel';
 import MusicService from '@services/MusicService';
