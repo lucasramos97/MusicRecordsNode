@@ -1,5 +1,5 @@
 export default class MusicFactory {
-  public factoryTenFirstMusicsForTesting(): any[] {
+  public factoryTenFirstMusicsForTesting(userId: number): any[] {
     const musics = [];
 
     musics.push({
@@ -8,6 +8,7 @@ export default class MusicFactory {
       releaseDate: new Date(),
       duration: new Date(),
       deleted: true,
+      userId,
     });
 
     for (let index = 2; index <= 10; index++) {
@@ -16,13 +17,14 @@ export default class MusicFactory {
         artist: `Artist ${index}`,
         releaseDate: new Date(),
         duration: new Date(),
+        userId,
       });
     }
 
     return musics;
   }
 
-  public factoryValidCredentialsMusic(): any {
+  public factoryValidCredentialsMusic(userId: number): any {
     const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
@@ -32,10 +34,11 @@ export default class MusicFactory {
       duration: new Date().toJSON(),
       numberViews: 1,
       feat: true,
+      userId,
     };
   }
 
-  public factoryMinimumValidCredentialsMusic(): any {
+  public factoryMinimumValidCredentialsMusic(userId: number): any {
     const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
@@ -43,10 +46,11 @@ export default class MusicFactory {
       artist: 'Artist 1',
       releaseDate,
       duration: new Date().toJSON(),
+      userId,
     };
   }
 
-  public factoryTenDeletedMusics(): any[] {
+  public factoryTenDeletedMusics(userId: number): any[] {
     const musics = [];
 
     for (let index = 1; index <= 10; index++) {
@@ -56,6 +60,7 @@ export default class MusicFactory {
         releaseDate: new Date(),
         duration: new Date(),
         deleted: true,
+        userId,
       });
     }
 

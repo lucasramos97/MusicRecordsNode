@@ -1,6 +1,7 @@
 import {
-  Table, Column, Model, DataType, AllowNull, Default,
+  Table, Column, Model, DataType, AllowNull, Default, ForeignKey,
 } from 'sequelize-typescript';
+import User from '@models/User';
 
 @Table({ tableName: 'musics' })
 export default class Music extends Model {
@@ -33,6 +34,10 @@ export default class Music extends Model {
   @Default(false)
   @Column
   private deleted: boolean;
+
+  @ForeignKey(() => User)
+  @Column
+  private userId: number;
 
   public getId(): number {
     return this.id;
@@ -92,6 +97,10 @@ export default class Music extends Model {
 
   public setDeleted(deleted: boolean) {
     this.deleted = deleted;
+  }
+
+  public getUserId(): number {
+    return this.userId;
   }
 
   public getCreatedAt(): Date {

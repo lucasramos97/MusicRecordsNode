@@ -1,22 +1,25 @@
 import AppController from '@controllers/AppController';
 import Music from '@models/Music';
+import User from '@models/User';
 import MusicFactory from '@utils/MusicFactory';
 
 const request = require('supertest');
 
 const app = new AppController().getExpress();
 const musicFactory = new MusicFactory();
+let user: User;
 
 beforeAll(async () => {
-  await Music.destroy({
+  await User.destroy({
     where: {},
     truncate: true,
   });
+  user = await User.create({ name: 'admin', email: 'admin@email.com', password: '123' });
 });
 
 describe('List Musics', () => {
   beforeAll(async () => {
-    const musics = musicFactory.factoryTenFirstMusicsForTesting();
+    const musics = musicFactory.factoryTenFirstMusicsForTesting(user.getId());
     await Music.bulkCreate(musics);
   });
 
@@ -72,7 +75,7 @@ describe('Get Music', () => {
 
 describe('Save Music', () => {
   it('save music with valid credentials', async () => {
-    const music = musicFactory.factoryValidCredentialsMusic();
+    const music = musicFactory.factoryValidCredentialsMusic(user.getId());
 
     const response = await request(app)
       .post('/musics')
@@ -83,7 +86,7 @@ describe('Save Music', () => {
   });
 
   it('save music with minimum valid credentials', async () => {
-    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    const music = musicFactory.factoryMinimumValidCredentialsMusic(user.getId());
 
     const response = await request(app)
       .post('/musics')
@@ -98,7 +101,7 @@ describe('Save Music', () => {
   });
 
   it('save music without title field', async () => {
-    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    const music = musicFactory.factoryMinimumValidCredentialsMusic(user.getId());
     music.title = '';
 
     const response = await request(app)
@@ -110,7 +113,7 @@ describe('Save Music', () => {
   });
 
   it('save music without artist field', async () => {
-    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    const music = musicFactory.factoryMinimumValidCredentialsMusic(user.getId());
     music.artist = '';
 
     const response = await request(app)
@@ -122,7 +125,7 @@ describe('Save Music', () => {
   });
 
   it('save music without release date field', async () => {
-    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    const music = musicFactory.factoryMinimumValidCredentialsMusic(user.getId());
     music.releaseDate = null;
 
     const response = await request(app)
@@ -134,7 +137,7 @@ describe('Save Music', () => {
   });
 
   it('save music without duration field', async () => {
-    const music = musicFactory.factoryMinimumValidCredentialsMusic();
+    const music = musicFactory.factoryMinimumValidCredentialsMusic(user.getId());
     music.duration = null;
 
     const response = await request(app)
@@ -257,7 +260,7 @@ describe('Delete Music', () => {
 
 describe('List Deleted Musics', () => {
   beforeAll(async () => {
-    const musics = musicFactory.factoryTenDeletedMusics();
+    const musics = musicFactory.factoryTenDeletedMusics(user.getId());
     await Music.bulkCreate(musics);
   });
 

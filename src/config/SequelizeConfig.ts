@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-constructor */
 import Music from '@models/Music';
+import User from '@models/User';
 import { Sequelize } from 'sequelize-typescript';
 
 const config = require('./database');
@@ -14,7 +15,7 @@ export default class SequelizeConfig {
     if (!SequelizeConfig.instance) {
       SequelizeConfig.instance = new Sequelize(config);
       const models: Array<any> = [
-        Music,
+        Music, User,
       ];
       SequelizeConfig.instance.addModels(models);
     }
