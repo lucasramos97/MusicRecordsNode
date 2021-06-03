@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import AppController from '@controllers/AppController';
 import Music from '@models/Music';
 import MusicFactory from '@utils/MusicFactory';
