@@ -8,6 +8,7 @@ export default class UserRoutes {
     this.routes = express.Router();
     const userController = new UserController();
     this.routes.post('/users/', userController.save);
+    this.routes.post('/login/', userController.login);
   }
 
   public getRoutes(): express.Router {

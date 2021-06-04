@@ -32,3 +32,20 @@ describe('Valid E-mail', () => {
     expect(StringUtils.validEmail(email4)).toBeFalsy();
   });
 });
+
+describe('Compare Encrypt Value', () => {
+  it('compare correct encrypt value', async () => {
+    const value = 'Test123';
+    const encryptValue = await StringUtils.encryptValue(value);
+    const result = await StringUtils.compareEncryptValue(value, encryptValue);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('compare incorrect encrypt value', async () => {
+    const encryptValue = await StringUtils.encryptValue('Test1234');
+    const result = await StringUtils.compareEncryptValue('Test123', encryptValue);
+
+    expect(result).toBeFalsy();
+  });
+});

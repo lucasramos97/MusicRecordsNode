@@ -8,4 +8,8 @@ export default class StringUtils {
   public static validEmail(email: string): boolean {
     return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email);
   }
+
+  public static async compareEncryptValue(value: string, encryptValue: string): Promise<boolean> {
+    return bcrypt.compare(value, encryptValue);
+  }
 }
