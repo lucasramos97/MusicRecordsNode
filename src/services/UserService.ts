@@ -1,8 +1,11 @@
 import User from '@models/User';
+import StringUtils from '@utils/StringUtils';
 
 export default class UserService {
   public async save(user: any): Promise<User> {
     await this.validate(user);
+    // eslint-disable-next-line no-param-reassign
+    user.password = await StringUtils.encryptValue(user.password);
     return User.create(user);
   }
 

@@ -14,7 +14,9 @@ describe('Save User', () => {
       .post('/users')
       .send(user);
 
-    expect(response.body).toMatchObject(user);
+    expect(response.body.name).toEqual(user.name);
+    expect(response.body.email).toEqual(user.email);
+    expect(response.body.password).not.toEqual(user.password);
     expect(response.status).toBe(201);
   });
 
