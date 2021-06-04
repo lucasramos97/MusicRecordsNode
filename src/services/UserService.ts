@@ -21,5 +21,9 @@ export default class UserService {
     if (!user.password) {
       throw new Error('Password is required!');
     }
+
+    if (!StringUtils.validEmail(user.email)) {
+      throw new Error('E-mail invalid!');
+    }
   }
 }
