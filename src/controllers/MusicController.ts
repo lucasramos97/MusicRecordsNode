@@ -10,17 +10,19 @@ export default class MusicController {
   Promise<Response<PaginatedQueryModel<Music>>> {
     const page = req.query.page ? Number.parseInt(req.query.page.toString(), 10) : 0;
     const size = req.query.size ? Number.parseInt(req.query.size.toString(), 10) : 5;
+    const { userId } = req.body;
 
-    const result = await musicService.getAllPagination(page, size);
+    const result = await musicService.getAllPagination(page, size, userId);
 
     return res.json(result);
   }
 
   public async getById(req: Request, res: Response): Promise<Response<Music>> {
     const musicId = Number.parseInt(req.params.id, 10);
+    const { userId } = req.body;
 
     try {
-      const result = await musicService.getById(musicId);
+      const result = await musicService.getById(musicId, userId);
 
       return res.status(200).json(result);
     } catch (error) {
@@ -55,9 +57,10 @@ export default class MusicController {
 
   public async logicalDelete(req: Request, res: Response): Promise<Response<Music>> {
     const musicId = Number.parseInt(req.params.id, 10);
+    const { userId } = req.body;
 
     try {
-      const result = await musicService.logicalDelete(musicId);
+      const result = await musicService.logicalDelete(musicId, userId);
 
       return res.status(200).json(result);
     } catch (error) {
@@ -66,7 +69,9 @@ export default class MusicController {
   }
 
   public async getCountDeletedMusics(req: Request, res: Response): Promise<Response<number>> {
-    const result = await musicService.getCountDeletedMusics();
+    const { userId } = req.body;
+
+    const result = await musicService.getCountDeletedMusics(userId);
 
     return res.json(result);
   }
@@ -75,17 +80,18 @@ export default class MusicController {
   Promise<Response<PaginatedQueryModel<Music>>> {
     const page = req.query.page ? Number.parseInt(req.query.page.toString(), 10) : 0;
     const size = req.query.size ? Number.parseInt(req.query.size.toString(), 10) : 5;
+    const { userId } = req.body;
 
-    const result = await musicService.getAllDeletedPagination(page, size);
+    const result = await musicService.getAllDeletedPagination(page, size, userId);
 
     return res.json(result);
   }
 
   public async restoreDeletedMusics(req: Request, res: Response): Promise<Response<Music>> {
-    const musics = req.body;
+    const { content, userId } = req.body;
 
     try {
-      const result = await musicService.restoreDeletedMusics(musics);
+      const result = await musicService.restoreDeletedMusics(content, userId);
 
       return res.status(200).json(result);
     } catch (error) {
@@ -95,9 +101,10 @@ export default class MusicController {
 
   public async definitiveDelete(req: Request, res: Response): Promise<Response<Music>> {
     const musicId = Number.parseInt(req.params.id, 10);
+    const { userId } = req.body;
 
     try {
-      const result = await musicService.definitiveDelete(musicId);
+      const result = await musicService.definitiveDelete(musicId, userId);
 
       return res.status(200).json(result);
     } catch (error) {
@@ -106,8 +113,10 @@ export default class MusicController {
   }
 
   public async emptyList(req: Request, res: Response): Promise<Response<number>> {
+    const { userId } = req.body;
+
     try {
-      const result = await musicService.emptyList();
+      const result = await musicService.emptyList(userId);
 
       return res.status(200).json(result);
     } catch (error) {

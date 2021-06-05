@@ -1,4 +1,5 @@
 import AppController from '@controllers/AppController';
+import User from '@models/User';
 import UserFactory from '@utils/UserFactory';
 
 const request = require('supertest');
@@ -7,6 +8,13 @@ const app = new AppController().getExpress();
 const userFactory = new UserFactory();
 
 describe('Save User', () => {
+  beforeAll(async () => {
+    await User.destroy({
+      where: {},
+      truncate: true,
+    });
+  });
+
   it('save user with valid credentials', async () => {
     const user = userFactory.factoryValidCredentialsUser();
 

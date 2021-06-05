@@ -24,7 +24,7 @@ export default class MusicFactory {
     return musics;
   }
 
-  public factoryValidCredentialsMusic(userId: number): any {
+  public factoryValidCredentialsMusic(): any {
     const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
@@ -34,11 +34,10 @@ export default class MusicFactory {
       duration: new Date().toJSON(),
       numberViews: 1,
       feat: true,
-      userId,
     };
   }
 
-  public factoryMinimumValidCredentialsMusic(userId: number): any {
+  public factoryMinimumValidCredentialsMusic(): any {
     const releaseDate = new Date().toJSON().split('T')[0];
 
     return {
@@ -46,7 +45,6 @@ export default class MusicFactory {
       artist: 'Artist 1',
       releaseDate,
       duration: new Date().toJSON(),
-      userId,
     };
   }
 
