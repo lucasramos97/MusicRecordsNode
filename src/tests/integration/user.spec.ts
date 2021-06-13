@@ -96,6 +96,8 @@ describe('Login', () => {
       .post('/login')
       .send(user);
 
+    expect(response.body.username).toBe(user.name);
+    expect(response.body.email).toBe(user.email);
     expect(response.body.token).not.toBeNull();
     expect(response.status).toBe(200);
   });

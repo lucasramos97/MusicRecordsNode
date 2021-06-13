@@ -12,7 +12,8 @@ export default class UserService {
 
   public async login(user: any): Promise<any> {
     const validUser = await this.validateLogin(user);
-    return new AuthenticationService().authenticate(validUser);
+    const result = await new AuthenticationService().authenticate(validUser);
+    return { username: validUser.getName(), email: validUser.getEmail(), token: result.token };
   }
 
   private async validateSave(user: any) {
