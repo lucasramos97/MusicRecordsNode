@@ -14,7 +14,7 @@ export default class UserController {
 
       return res.status(201).json(result);
     } catch (error) {
-      if (error instanceof UniqueConstraintError && error.fields[0] === 'email') {
+      if (error instanceof UniqueConstraintError && error.errors[0].type === 'unique violation') {
         return res.status(400).json({ message: `The ${user.email} e-mail has already been registered!` });
       }
       return res.status(400).json({ message: error.message });
