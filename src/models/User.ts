@@ -2,11 +2,15 @@ import {
   Table, Column, Model, AllowNull,
 } from 'sequelize-typescript';
 
+import StringUtils from 'src/utils/StringUtils';
+
+import { IUserJson } from 'src/interfaces/IUserJson';
+
 @Table({ tableName: 'users' })
 export default class User extends Model {
   @AllowNull(false)
   @Column
-  private name: string;
+  private username: string;
 
   @AllowNull(false)
   @Column
@@ -20,12 +24,12 @@ export default class User extends Model {
     return this.id;
   }
 
-  public getName(): string {
-    return this.name;
+  public getUsername(): string {
+    return this.username;
   }
 
-  public setName(name: string) {
-    this.name = name;
+  public setUsername(username: string) {
+    this.username = username;
   }
 
   public getEmail(): string {
@@ -42,5 +46,26 @@ export default class User extends Model {
 
   public setPassword(password: string) {
     this.password = password;
+  }
+
+  public getCreatedAt(): Date {
+    return this.createdAt;
+  }
+
+  public getUpdatedAt(): Date {
+    return this.updatedAt;
+  }
+
+  public toJSON(): IUserJson {
+    const json: any = super.toJSON();
+
+    return {
+      id: json.id,
+      username: json.username,
+      email: json.email,
+      password: json.password,
+      created_at: StringUtils.formatDateTime(this.createdAt),
+      updated_at: StringUtils.formatDateTime(this.updatedAt),
+    };
   }
 }

@@ -1,13 +1,15 @@
+import * as jwt from 'jsonwebtoken';
+
 import { Request, Response } from 'express';
 
-const jwt = require('jsonwebtoken');
+import Messages from 'src/utils/Messages';
 
 export default class AuthenticationController {
   public verifyJWT(req: Request, res: Response, next) {
     const { authorization } = req.headers;
 
     if (!authorization) {
-      return res.status(401).json({ message: 'Header Authorization not present!' });
+      return res.status(401).json({ message: Messages.HEADER_AUTHORIZATION_NOT_PRESENT });
     }
 
     const authorizationSplit = authorization.split(' ');
@@ -15,15 +17,23 @@ export default class AuthenticationController {
     const token = authorizationSplit[1];
 
     if (bearer !== 'Bearer') {
-      return res.status(401).json({ message: 'No Bearer HTTP authentication scheme!' });
+      return res.status(401).json({ message: Messages.NO_BEARER_AUTHENTICATION_SCHEME });
     }
 
     if (!token) {
-      return res.status(401).json({ message: 'No token provided!' });
+      return res.status(401).json({ message: Messages.NO_TOKEN_PROVIDED });
     }
 
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
+        if (err.message === 'jwt malformed') {
+          return res.status(401).json({ message: Messages.INVALID_TOKEN });
+        }
+
+        if (err.message === 'jwt expired') {
+          return res.status(401).json({ message: Messages.TOKEN_EXPIRED });
+        }
+
         return res.status(401).json({ message: err.message });
       }
 

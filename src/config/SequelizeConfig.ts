@@ -1,7 +1,8 @@
 /* eslint-disable no-useless-constructor */
-import Music from '@models/Music';
-import User from '@models/User';
 import { Sequelize } from 'sequelize-typescript';
+
+import Music from 'src/models/Music';
+import User from 'src/models/User';
 
 const config = require('./database');
 

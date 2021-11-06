@@ -1,4 +1,4 @@
-import AppController from '@controllers/AppController';
+import AppController from 'src/controllers/AppController';
 
 const app = new AppController().getExpress();
 

@@ -1,5 +1,6 @@
-import UserController from '@controllers/UserController';
 import express from 'express';
+
+import UserController from 'src/controllers/UserController';
 
 export default class UserRoutes {
   private routes: express.Router;

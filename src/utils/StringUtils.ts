@@ -1,15 +1,44 @@
-const bcrypt = require('bcrypt');
-
 export default class StringUtils {
-  public static async encryptValue(value: string): Promise<string> {
-    return bcrypt.hash(value, 10);
+  public static formatDuration(duration: Date): string {
+    if (!duration) {
+      return '';
+    }
+
+    const time = new Date(duration);
+    const hours = this.addLeadingZero(time.getHours());
+    const minutes = this.addLeadingZero(time.getMinutes());
+    const seconds = this.addLeadingZero(time.getSeconds());
+
+    return `${hours}:${minutes}:${seconds}`;
   }
 
-  public static validEmail(email: string): boolean {
-    return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email);
+  public static formatDateTime(dateTime: Date): string {
+    if (!dateTime) {
+      return '';
+    }
+
+    const year = dateTime.getFullYear();
+    const month = this.addLeadingZero(dateTime.getMonth());
+    const day = this.addLeadingZero(dateTime.getDay());
+    const hours = this.addLeadingZero(dateTime.getHours());
+    const minutes = this.addLeadingZero(dateTime.getMinutes());
+    const seconds = this.addLeadingZero(dateTime.getSeconds());
+    const milliseconds = this.addLeadingZero(dateTime.getMilliseconds(), 2, false);
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   }
 
-  public static async compareEncryptValue(value: string, encryptValue: string): Promise<boolean> {
-    return bcrypt.compare(value, encryptValue);
+  private static addLeadingZero(value: number, quant = 1, left = true): string {
+    if (quant < 1) {
+      return `${value}`;
+    }
+
+    const numberOfZeros = (quant + 1) - String(value).length;
+    let result = '';
+    for (let i = 0; i < numberOfZeros; i++) {
+      result += '0';
+    }
+
+    return left ? `${result}${value}` : `${value}${result}`;
   }
 }

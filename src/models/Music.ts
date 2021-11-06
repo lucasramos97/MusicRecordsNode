@@ -1,7 +1,11 @@
 import {
   Table, Column, Model, DataType, AllowNull, Default, ForeignKey,
 } from 'sequelize-typescript';
-import User from '@models/User';
+
+import StringUtils from 'src/utils/StringUtils';
+import User from 'src/models/User';
+
+import { IMusicJson } from 'src/interfaces/IMusicJson';
 
 @Table({ tableName: 'musics' })
 export default class Music extends Model {
@@ -41,6 +45,10 @@ export default class Music extends Model {
 
   public getId(): number {
     return this.id;
+  }
+
+  public setId(id: number) {
+    this.id = id;
   }
 
   public getTitle(): string {
@@ -109,5 +117,21 @@ export default class Music extends Model {
 
   public getUpdatedAt(): Date {
     return this.updatedAt;
+  }
+
+  public toJSON(): IMusicJson {
+    const json: any = super.toJSON();
+
+    return {
+      id: json.id,
+      title: json.title,
+      artist: json.artist,
+      release_date: json.releaseDate,
+      duration: StringUtils.formatDuration(this.duration),
+      number_views: json.numberViews,
+      feat: json.feat,
+      created_at: StringUtils.formatDateTime(this.createdAt),
+      updated_at: StringUtils.formatDateTime(this.updatedAt),
+    };
   }
 }

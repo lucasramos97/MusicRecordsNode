@@ -1,12 +1,17 @@
-import Music from '@models/Music';
-import PaginatedQueryModel from '@models/PaginatedQueryModel';
+import Messages from 'src/utils/Messages';
+import Music from 'src/models/Music';
+import ResponseError from 'src/erros/ResponseError';
+
+import { IPaginatedQueryModel } from 'src/interfaces/IPaginatedQueryModel';
+import { IMusicJson } from 'src/interfaces/IMusicJson';
+import { IMusic } from 'src/interfaces/IMusic';
 
 export default class MusicService {
-  public async getAllPagination(page = 0, size = 5, userId: number):
-  Promise<PaginatedQueryModel<Music>> {
+  public async getAllMusics(userId: number, page = 0, size = 5, deleted = false):
+    Promise<IPaginatedQueryModel<Music>> {
     const result = await Music.findAndCountAll({
       where: {
-        deleted: false,
+        deleted,
         user_id: userId,
       },
       order: [
@@ -17,36 +22,47 @@ export default class MusicService {
       limit: size,
     });
 
-    return new PaginatedQueryModel<Music>(result);
+    return {
+      content: result.rows,
+      total: result.count,
+    };
   }
 
   public async getById(musicId: number, userId: number): Promise<Music> {
     return this.getMusicIfExists(musicId, userId);
   }
 
-  public async save(music: any): Promise<Music> {
-    await this.validate(music);
+  public async save(musicJson: IMusicJson): Promise<Music> {
+    await this.validate(musicJson);
+    const music = await this.createMusic(musicJson);
+
     return Music.create(music);
   }
 
-  public async update(musicId: number, music: any): Promise<[number, Music[]]> {
-    await this.validate(music);
-    await this.getMusicIfExists(musicId, music.userId);
-    return Music.update(
-      music,
-      { where: { id: musicId, user_id: music.userId } },
-    );
+  public async update(musicId: number, musicJson: IMusicJson): Promise<Music> {
+    await this.validate(musicJson);
+    const dbMusic = await this.getMusicIfExists(musicId, musicJson.userId);
+    dbMusic.setTitle(musicJson.title);
+    dbMusic.setArtist(musicJson.artist);
+    dbMusic.setReleaseDate(new Date(`${musicJson.release_date}T00:00:00`));
+    dbMusic.setDuration(new Date(`2021-01-01T${musicJson.duration}`));
+
+    if (musicJson.number_views !== undefined) {
+      dbMusic.setNumberViews(musicJson.number_views);
+    }
+
+    if (musicJson.feat !== undefined) {
+      dbMusic.setFeat(musicJson.feat);
+    }
+
+    return dbMusic.save();
   }
 
-  public async logicalDelete(musicId: number, userId: number): Promise<[number, Music[]]> {
-    await this.getMusicIfExists(musicId, userId);
+  public async delete(musicId: number, userId: number): Promise<Music> {
+    const dbMusic = await this.getMusicIfExists(musicId, userId);
+    dbMusic.setDeleted(true);
 
-    const response = await Music.update(
-      { deleted: true },
-      { where: { id: musicId, user_id: userId } },
-    );
-
-    return response;
+    return dbMusic.save();
   }
 
   public async getCountDeletedMusics(userId: number): Promise<number> {
@@ -58,39 +74,25 @@ export default class MusicService {
     });
   }
 
-  public async getAllDeletedPagination(page = 0, size = 5, userId: number):
-  Promise<PaginatedQueryModel<Music>> {
-    const result = await Music.findAndCountAll({
-      where: {
-        deleted: true,
-        user_id: userId,
-      },
-      order: [
-        ['artist', 'ASC'],
-        ['title', 'ASC'],
-      ],
-      offset: size * page,
-      limit: size,
-    });
+  public async restoreDeletedMusics(musicsJson: IMusicJson[], userId: number): Promise<number> {
+    const ids: number[] = musicsJson.map((m) => m.id);
 
-    return new PaginatedQueryModel<Music>(result);
-  }
+    if (ids.some((i) => i === undefined)) {
+      throw new ResponseError(Messages.ID_IS_REQUIRED, 400);
+    }
 
-  public async restoreDeletedMusics(musics: Music[], userId: number): Promise<[number, Music[]]> {
-    const response = await Music.update(
+    const [response] = await Music.update(
       { deleted: false },
-      { where: { id: musics.map((m) => m.id), user_id: userId } },
+      { where: { id: ids, deleted: true, user_id: userId } },
     );
 
     return response;
   }
 
-  public async definitiveDelete(musicId: number, userId: number): Promise<Music> {
+  public async definitiveDelete(musicId: number, userId: number): Promise<void> {
     const music = await this.getMusicIfNotExists(musicId, userId);
 
     await music.destroy();
-
-    return music;
   }
 
   public async emptyList(userId: number): Promise<number> {
@@ -102,39 +104,80 @@ export default class MusicService {
     });
   }
 
-  private async validate(music: any) {
-    if (!music.title) {
-      throw new Error('Title is required!');
-    }
-
-    if (!music.artist) {
-      throw new Error('Artist is required!');
-    }
-
-    if (!music.releaseDate) {
-      throw new Error('Release Date is required!');
-    }
-
-    if (!music.duration) {
-      throw new Error('Duration is required!');
-    }
-  }
-
   private async getMusicIfExists(musicId: number, userId: number): Promise<Music> {
-    const music = await Music.findOne({ where: { id: musicId, user_id: userId } });
+    const music = await Music.findOne({
+      where: {
+        id: musicId,
+        user_id: userId,
+      },
+    });
 
     if (!music || (music && music.isDeleted())) {
-      throw Error('Music not found!');
+      throw new ResponseError(Messages.MUSIC_NOT_FOUND, 404);
     }
 
     return music;
+  }
+
+  private async validate(musicJson: IMusicJson) {
+    if (!musicJson.title) {
+      throw new ResponseError(Messages.TITLE_IS_REQUIRED, 400);
+    }
+
+    if (!musicJson.artist) {
+      throw new ResponseError(Messages.ARTIST_IS_REQUIRED, 400);
+    }
+
+    if (!musicJson.release_date) {
+      throw new ResponseError(Messages.RELEASE_DATE_IS_REQUIRED, 400);
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(musicJson.release_date)) {
+      throw new ResponseError(Messages.WRONG_RELEASE_DATE_FORMAT, 400);
+    }
+
+    const releaseDate = new Date(`${musicJson.release_date}T00:00:00`);
+
+    if (Number.isNaN(releaseDate.getDate())) {
+      throw new ResponseError(Messages.getInvalidDate(musicJson.release_date), 400);
+    }
+
+    if (releaseDate > new Date()) {
+      throw new ResponseError(Messages.RELEASE_DATE_CANNOT_BE_FUTURE, 400);
+    }
+
+    if (!musicJson.duration) {
+      throw new ResponseError(Messages.DURATION_IS_REQUIRED, 400);
+    }
+
+    if (!/^\d{2}:\d{2}:\d{2}$/.test(musicJson.duration)) {
+      throw new ResponseError(Messages.WRONG_DURATION_FORMAT, 400);
+    }
+
+    const duration = new Date(`2021-01-01T${musicJson.duration}`);
+
+    if (Number.isNaN(duration.getDate())) {
+      throw new ResponseError(Messages.getInvalidTime(musicJson.duration), 400);
+    }
+  }
+
+  private async createMusic(musicJson: IMusicJson): Promise<IMusic> {
+    return {
+      title: musicJson.title,
+      artist: musicJson.artist,
+      releaseDate: new Date(`${musicJson.release_date}T00:00:00`),
+      duration: new Date(`2021-01-01T${musicJson.duration}`),
+      numberViews: musicJson.number_views,
+      feat: musicJson.feat,
+      userId: musicJson.userId,
+    };
   }
 
   private async getMusicIfNotExists(musicId: number, userId: number): Promise<Music> {
     const music = await Music.findOne({ where: { id: musicId, user_id: userId } });
 
     if (!music || (music && !music.isDeleted())) {
-      throw Error('Music not deleted!');
+      throw new ResponseError(Messages.MUSIC_NOT_FOUND, 404);
     }
 
     return music;

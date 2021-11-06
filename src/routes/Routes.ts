@@ -1,7 +1,8 @@
 import express from 'express';
-import MusicRoutes from '@routes/MusicRoutes';
-import UserRoutes from '@routes/UserRoutes';
-import AuthenticationController from '@controllers/AuthenticationController';
+
+import AuthenticationController from 'src/controllers/AuthenticationController';
+import MusicRoutes from 'src/routes/MusicRoutes';
+import UserRoutes from 'src/routes/UserRoutes';
 
 export default class Routes {
   private routes: express.Router;
