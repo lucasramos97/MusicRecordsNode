@@ -23,11 +23,15 @@ export default class MusicFactory {
   }
 
   private factoryMusic(deleted: boolean, userId: number): IMusic {
+    const now = new Date();
+    const tomorow = new Date();
+    tomorow.setDate(now.getDate() + 1);
+
     return {
       title: faker.lorem.words(),
       artist: faker.name.findName(),
       releaseDate: faker.date.past(),
-      duration: faker.date.between(new Date(), new Date().getDate() + 1),
+      duration: faker.date.between(now, tomorow),
       numberViews: faker.datatype.number(),
       feat: faker.datatype.boolean(),
       deleted,

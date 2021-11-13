@@ -14,6 +14,10 @@ export default class SequelizeConfig {
 
   public static config() {
     if (!SequelizeConfig.instance) {
+      if (config.dialect === 'mysql') {
+        config.timezone = '-03:00';
+      }
+
       SequelizeConfig.instance = new Sequelize(config);
       const models: Array<any> = [
         Music, User,

@@ -1,10 +1,12 @@
+import DateUtils from 'src/utils/DateUtils';
+
 export default class StringUtils {
   public static formatDuration(duration: Date): string {
     if (!duration) {
       return '';
     }
 
-    const time = new Date(duration);
+    const time = DateUtils.createDuration(duration.toString());
     const hours = this.addLeadingZero(time.getHours());
     const minutes = this.addLeadingZero(time.getMinutes());
     const seconds = this.addLeadingZero(time.getSeconds());

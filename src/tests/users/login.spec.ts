@@ -108,7 +108,7 @@ describe('Create User', () => {
       .post('/login')
       .send(allAttributesLogin);
 
-    const expectedMessage = Messages.getPasswordDoesNotMatchWithEmail(allAttributesLogin.password);
+    const expectedMessage = Messages.getPasswordDoesNotMatchWithEmail(allAttributesLogin.email);
 
     expect(response.body.message).toBe(expectedMessage);
     expect(response.status).toBe(401);

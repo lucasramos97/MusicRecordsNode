@@ -1,3 +1,4 @@
+import DateUtils from 'src/utils/DateUtils';
 import Messages from 'src/utils/Messages';
 import Music from 'src/models/Music';
 import ResponseError from 'src/erros/ResponseError';
@@ -44,8 +45,8 @@ export default class MusicService {
     const dbMusic = await this.getMusicIfExists(musicId, musicJson.userId);
     dbMusic.setTitle(musicJson.title);
     dbMusic.setArtist(musicJson.artist);
-    dbMusic.setReleaseDate(new Date(`${musicJson.release_date}T00:00:00`));
-    dbMusic.setDuration(new Date(`2021-01-01T${musicJson.duration}`));
+    dbMusic.setReleaseDate(DateUtils.createReleaseDate(musicJson.release_date));
+    dbMusic.setDuration(DateUtils.createDuration(musicJson.duration));
 
     if (musicJson.number_views !== undefined) {
       dbMusic.setNumberViews(musicJson.number_views);
@@ -136,7 +137,7 @@ export default class MusicService {
       throw new ResponseError(Messages.WRONG_RELEASE_DATE_FORMAT, 400);
     }
 
-    const releaseDate = new Date(`${musicJson.release_date}T00:00:00`);
+    const releaseDate = DateUtils.createReleaseDate(musicJson.release_date);
 
     if (Number.isNaN(releaseDate.getDate())) {
       throw new ResponseError(Messages.getInvalidDate(musicJson.release_date), 400);
@@ -154,7 +155,7 @@ export default class MusicService {
       throw new ResponseError(Messages.WRONG_DURATION_FORMAT, 400);
     }
 
-    const duration = new Date(`2021-01-01T${musicJson.duration}`);
+    const duration = DateUtils.createDuration(musicJson.duration);
 
     if (Number.isNaN(duration.getDate())) {
       throw new ResponseError(Messages.getInvalidTime(musicJson.duration), 400);
@@ -165,8 +166,8 @@ export default class MusicService {
     return {
       title: musicJson.title,
       artist: musicJson.artist,
-      releaseDate: new Date(`${musicJson.release_date}T00:00:00`),
-      duration: new Date(`2021-01-01T${musicJson.duration}`),
+      releaseDate: DateUtils.createReleaseDate(musicJson.release_date),
+      duration: DateUtils.createDuration(musicJson.duration),
       numberViews: musicJson.number_views,
       feat: musicJson.feat,
       userId: musicJson.userId,

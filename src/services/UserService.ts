@@ -1,5 +1,4 @@
 import * as bcrypt from 'bcrypt';
-import { UniqueConstraintError } from 'sequelize';
 
 import AuthenticationService from 'src/services/AuthenticationService';
 import Messages from 'src/utils/Messages';
@@ -15,14 +14,19 @@ export default class UserService {
 
   public async save(userJson: IUserJson): Promise<User> {
     await this.validateCreateUser(userJson);
+    const dbUser = await User.findOne({
+      where: {
+        email: userJson.email,
+      },
+    });
+
+    if (dbUser) {
+      throw new ResponseError(Messages.getEmailAlreadyRegistered(userJson.email), 400);
+    }
     // eslint-disable-next-line no-param-reassign
     userJson.password = await bcrypt.hash(userJson.password, 10);
 
     return User.create(userJson).then((r) => r).catch((error) => {
-      if (error instanceof UniqueConstraintError && error.errors[0].type === 'unique violation') {
-        throw new ResponseError(Messages.getEmailAlreadyRegistered(userJson.email), 400);
-      }
-
       throw new ResponseError(error.message, 400);
     });
   }
@@ -76,7 +80,7 @@ export default class UserService {
     const validPassword = await bcrypt.compare(login.password, dbUser.getPassword());
 
     if (!validPassword) {
-      throw new ResponseError(Messages.getPasswordDoesNotMatchWithEmail(login.password), 401);
+      throw new ResponseError(Messages.getPasswordDoesNotMatchWithEmail(login.email), 401);
     }
 
     return dbUser;
